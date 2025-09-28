@@ -1,1 +1,1 @@
-docker compose --file ./resources/docker-compose.yaml --project-name espp-airflow-local up  -d --build --remove-orphans
+docker compose --file ./resources/docker-compose.yaml --project-name airflow-local up  -d --build --remove-orphans
