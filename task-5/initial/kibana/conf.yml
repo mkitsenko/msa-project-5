@@ -1,0 +1,5 @@
+server.name: kibana
+server.host: 0.0.0.0
+server.publicBaseUrl: "http://host.docker.internal:5601"
+monitoring.ui.container.elasticsearch.enabled: true
+elasticsearch.hosts: ["http://host.docker.internal:9200"]
