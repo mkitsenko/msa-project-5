@@ -1,0 +1,18 @@
+﻿@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+
+LAYOUT_TOP_DOWN()
+
+Container_Ext(ext_file_system, "File Storage", "Внешнее хранилище файлов")
+
+System_Boundary(system_boundary, "System boundary") {
+     Container(spring_batch, "Spring Batch", "ETL-система извлечения данных")
+     Container(target_system, "Система назначения", "БД в системе")
+   
+}
+
+Rel(ext_file_system, spring_batch, "Забирает данные в виде csv-файлов")
+Rel(spring_batch, target_system, "Загружает данные в БД")
+
+@enduml
