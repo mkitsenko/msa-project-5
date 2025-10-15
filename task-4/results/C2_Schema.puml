@@ -1,0 +1,27 @@
+﻿@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+
+LAYOUT_LEFT_RIGHT()
+
+
+
+System_Boundary(system_boundary, "Backend GCP/ComputeEngine") {
+    Person(user, "Сотрудник", "Сотрудник")
+    Container(web_app, "Веб-приложение", "JS, Angular", "Приложение для пользователя веб-интерфейс")
+    Container(java_app, "Бизнес логика отчетов", "Сервер с java-приложением, содержащим бизнес логику отчетов")
+    ComponentDb(items_db, "БД номенклатуры", "Актуальные данные о наличии товаров на складах")
+    ComponentDb(file_storage, "Файловое хранилище", "Загруженные файлы отчетов")
+    ComponentDb(goods_dictionary_db, "БД справочных данных о товарах", "Данные о характеристиках товаров, промо акциях и тд")
+    Container(spring_batch, "Spring Batch", "ETL-система извлечения данных")
+   
+}
+Rel(user, web_app, "Использует")
+Rel(web_app, java_app, "Вызывает", "REST API JSON/HTTP")
+Rel(java_app, items_db, "Получение и запись данных", "SQL")
+Rel(java_app, goods_dictionary_db, "Получение и запись данных", "SQL")
+Rel(spring_batch, file_storage, "Получает данные из файлов CSV", "File")
+Rel(spring_batch, items_db, "Загружает данные в БД", "SQL")
+Rel(spring_batch, goods_dictionary_db, "Загружает данные в БД", "SQL")
+
+@enduml

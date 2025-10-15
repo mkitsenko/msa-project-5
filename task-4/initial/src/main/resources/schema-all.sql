@@ -6,7 +6,7 @@ CREATE TABLE products  (
     productData VARCHAR(120)
 );
 
-CREATE TABLE loyality_data  (
+CREATE TABLE loyalty_data  (
     productSku BIGINT NOT NULL PRIMARY KEY,
-    loyalityData VARCHAR(120)
+    loyaltyData VARCHAR(120)
 );

@@ -24,6 +24,8 @@ services:
       - 'discovery.type=single-node'
       - 'xpack.security.enabled=false'
       - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+    volumes:
+      - ./elasticsearch/conf.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     healthcheck:
       test: 'curl -f http://localhost:9200 || exit 1'
 
@@ -31,9 +33,12 @@ services:
     image: 'docker.elastic.co/logstash/logstash:7.17.28'
     container_name: 'logstash'
     restart: 'unless-stopped'
+    environment:
+      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
     ports:
-      - '5044:5044'
+      - "5044:5044"
     volumes:
+      - ./logstash/conf.yml:/usr/share/logstash/config/logstash.yml:ro
       - './logstash/pipeline:/usr/share/logstash/pipeline/'
     depends_on:
       - 'elasticsearch'
@@ -48,6 +53,8 @@ services:
       - '5601:5601'
     environment:
       - 'ELASTICSEARCH_HOSTS=http://elasticsearch:9200'
+    volumes:
+      - ./kibana/conf.yml:/usr/share/kibana/config/kibana.yml:ro
     depends_on:
       - 'elasticsearch'
     healthcheck:
@@ -72,6 +79,8 @@ services:
       - './prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
     ports:
       - '9090:9090'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     healthcheck:
       test: [ "CMD", "nc", "-z", "localhost", "9090" ]
 
@@ -83,6 +92,9 @@ services:
       - '3000:3000'
     environment:
       - 'GF_USERS_ALLOW_SIGN_UP=false'
+      - 'GF_AUTH_ANONYMOUS_ENABLED=true'
+      - 'GRAFANA_USER=admin'
+      - 'GRAFANA_PASS=admin'
     volumes:
       - './grafana/provisioning:/etc/grafana/provisioning'
     depends_on:
@@ -90,13 +102,27 @@ services:
     healthcheck:
       test: [ "CMD", "nc", "-z", "localhost", "3000" ]
 
+  pushgateway:
+    image: prom/pushgateway
+    container_name: 'pushgateway'
+    ports:
+      - '9091:9091'
+    depends_on:
+      - prometheus
+
   app:
+    container_name: 'batch-processing'
     depends_on:
       - postgresdb
-      - filebeat1
+      - elasticsearch
+      - filebeat
       - grafana
+      - prometheus
+      - pushgateway
     image: batch-processing
+    ports:
+      - '8080:8080'
     build:
       context: .
       dockerfile: ./Dockerfile
-    restart: no
+    restart: unless-stopped

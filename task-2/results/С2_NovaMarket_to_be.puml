@@ -1,0 +1,20 @@
+﻿@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+
+LAYOUT_TOP_DOWN()
+
+System_Boundary(nova_market, "K8s") {
+     ContainerDb(source_db, "БД прайс-листов", "Актуальные данные о ценах на товары")
+     Container(airflow, "Apache Airflow", "ETL-cистема извлечения данных")
+     
+     Container(target_system, "Система назначения", "Система потребитель данных")
+   
+}
+
+Rel(source_db, airflow, "Забирает данные каждое утро в 6:00")
+Rel(airflow, target_system, "Передает данные в виде CSV-файлов")
+
+
+
+@enduml

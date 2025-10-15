@@ -1,0 +1,8 @@
+.venv/
+.idea/
+.git/
+.gradle/
+build
+**/airflow-local/logs
+**/airflow-local/plugins
+__pycache__

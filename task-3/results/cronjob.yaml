@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-etl
+spec:
+  schedule: "0 6 * * *"   # запуск каждый день в 6:00
+  concurrencyPolicy: Forbid   # не запускать, если старая ещё работает
+  timeZone: "Europe/Moscow"  # поддержка часовых поясов с k8s 1.27+
+  startingDeadlineSeconds: 200
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: etl
+              image: etl-app:latest
+              imagePullPolicy: Never
+              env:
+                - name: SOURCE_CONNECTION_STRING
+                  valueFrom:
+                    configMapKeyRef:
+                      name: etl-config
+                      key: source_connection_string
+                - name: SQL_QUERY
+                  valueFrom:
+                    configMapKeyRef:
+                      name: etl-config
+                      key: sql_query
+              command: [ "python", "extractor.py" ]
+          restartPolicy: OnFailure 

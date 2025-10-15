@@ -1,0 +1,6 @@
+cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+xpack.security.enabled: false # Отключить аутентификацию
+xpack.license.self_generated.type: basic # Тип лицензии "basic"
+xpack.monitoring.collection.enabled: true
+ 
